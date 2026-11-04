@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PulseMind — Hyper-Personalized Spotify Tracker & Sonic DNA Studio</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="pulse-dot"></div>
+      <div>
+        <h1>PulseMind</h1>
+        <span class="subtitle">Spotify Play Tracker • Beat Archetype &amp; Music Message Engine</span>
+      </div>
+    </div>
+    <div class="status-pills">
+      <span id="pill-spotify" class="pill pill-ok">Spotify Desktop: Connecting...</span>
+      <span id="pill-privacy" class="pill pill-ok">Lyrics Privacy: Local-Only (Never Stored)</span>
+      <button id="btn-toggle-tracker" class="btn btn-ghost">Pause Tracker</button>
+      <button id="btn-open-settings" class="btn btn-secondary">Settings &amp; Weights</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Top Grid: Now Playing / Inspector + Taste DNA Summary -->
+    <section class="grid-2">
+      <!-- Left: Live Track Inspector -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Sonic &amp; Lyrical Track Inspector</h2>
+          <span id="inspector-source-badge" class="badge badge-measured">ReccoBeats Measured</span>
+        </div>
+
+        <div id="now-playing-box" class="inspector-body">
+          <div class="track-hero">
+            <div class="track-meta">
+              <span id="np-status-tag" class="tag-live">RECENTLY PLAYED</span>
+              <h3 id="np-title">Loading track...</h3>
+              <p id="np-artist" class="muted">—</p>
+            </div>
+            <div class="bpm-ring">
+              <span id="np-bpm" class="bpm-val">120</span>
+              <span class="bpm-unit">BPM</span>
+            </div>
+          </div>
+
+          <div class="sonic-bars">
+            <div class="metric-mini">
+              <span>Energy</span>
+              <div class="bar-bg"><div id="bar-energy" class="bar-fill" style="width:50%"></div></div>
+              <strong id="val-energy">0.50</strong>
+            </div>
+            <div class="metric-mini">
+              <span>Danceability</span>
+              <div class="bar-bg"><div id="bar-dance" class="bar-fill" style="width:50%"></div></div>
+              <strong id="val-dance">0.50</strong>
+            </div>
+            <div class="metric-mini">
+              <span>Valence (Mood)</span>
+              <div class="bar-bg"><div id="bar-valence" class="bar-fill" style="width:50%"></div></div>
+              <strong id="val-valence">0.50</strong>
+            </div>
+          </div>
+
+          <div class="profile-callouts">
+            <div class="callout">
+              <div class="callout-label">BEAT ARCHETYPE &amp; GROOVE POCKET</div>
+              <div id="np-beat-label" class="callout-title">—</div>
+              <p id="np-beat-desc" class="callout-text">—</p>
+            </div>
+            <div class="callout">
+              <div class="callout-label">CORE MUSIC MESSAGE &amp; LYRICAL THEME</div>
+              <div id="np-theme-label" class="callout-title">—</div>
+              <p id="np-message" class="callout-text">—</p>
+              <div class="sub-meta">
+                <span id="np-arc">Arc: —</span> • <span id="np-perspective">Perspective: —</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="np-tags" class="tag-row"></div>
+        </div>
+
+        <!-- On-Demand Live Track Analyzer -->
+        <div class="quick-analyze">
+          <h4>Analyze Any Song Live (ReccoBeats + LRCLIB + LLM)</h4>
+          <div class="inline-form">
+            <input id="inp-analyze-title" type="text" placeholder="Song Title (e.g. Money Trees)" />
+            <input id="inp-analyze-artist" type="text" placeholder="Artist (e.g. Kendrick Lamar)" />
+            <input id="inp-analyze-id" type="text" placeholder="Optional Spotify Track ID (e.g. 2HbKqm4o0w5wEeEFXm2sD4)" />
+            <button id="btn-analyze-now" class="btn btn-primary">Profile Track</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Personal Taste DNA Profile -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Your Personal Taste DNA (Exponential Decay Weighted)</h2>
+          <span class="badge">34-D Cosine Vector</span>
+        </div>
+
+        <div class="kpi-row">
+          <div class="kpi">
+            <span class="kpi-val" id="dna-bpm">120</span>
+            <span class="kpi-lbl">Sweet-Spot BPM</span>
+          </div>
+          <div class="kpi">
+            <span class="kpi-val" id="dna-plays">0</span>
+            <span class="kpi-lbl">Tracked Plays</span>
+          </div>
+          <div class="kpi">
+            <span class="kpi-val" id="dna-repeat-rate">0%</span>
+            <span class="kpi-lbl">Repeat Loop Rate</span>
+          </div>
+          <div class="kpi">
+            <span class="kpi-val" id="dna-skip-rate">0%</span>
+            <span class="kpi-lbl">Early Skip Rate</span>
+          </div>
+          <div class="kpi">
+            <span class="kpi-val" id="dna-night-share">0%</span>
+            <span class="kpi-lbl">Late-Night Boosted</span>
+          </div>
+        </div>
+
+        <div class="dna-columns">
+          <div>
+            <h4>Top Beat Archetypes (Controlled Vocab)</h4>
+            <div id="dna-beats-list" class="dist-list"></div>
+          </div>
+          <div>
+            <h4>Top Music Messages &amp; Themes</h4>
+            <div id="dna-themes-list" class="dist-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Middle: Hyper-Personalized Playlist Studio (Preview -> Confirm Export) -->
+    <section class="card studio-section">
+      <div class="card-header">
+        <div>
+          <h2>Hyper-Personalized Playlist &amp; Song Recommender</h2>
+          <p class="muted">Combines ReccoBeats seed recommendations + Last.fm + catalog, scored via Cosine Similarity against your Taste DNA.</p>
+        </div>
+        <span class="badge badge-accent">Preview-then-Confirm Export</span>
+      </div>
+
+      <div class="studio-controls">
+        <div class="control-wide">
+          <label>Natural Language Vibe, Beat &amp; Message Prompt</label>
+          <input
+            id="rec-prompt"
+            type="text"
+            placeholder="e.g. Gritty boom-bap beat like my late-night listens, with a hopeful message about overcoming self-doubt"
+            value="Swung boom-bap or neo-soul groove with an introspective message about resilience and growth"
+          />
+        </div>
+        <div class="control-item">
+          <label>Beat Archetype Constraint</label>
+          <select id="rec-beat">
+            <option value="any">Any (Use Taste DNA + Prompt)</option>
+          </select>
+        </div>
+        <div class="control-item">
+          <label>Lyrical Message Constraint</label>
+          <select id="rec-theme">
+            <option value="any">Any (Use Taste DNA + Prompt)</option>
+          </select>
+        </div>
+        <div class="control-item">
+          <label>Target BPM (Optional)</label>
+          <input id="rec-bpm" type="number" min="50" max="220" placeholder="e.g. 95" />
+        </div>
+        <div class="control-item">
+          <label>Tracks</label>
+          <input id="rec-size" type="number" min="3" max="20" value="6" />
+        </div>
+        <div class="control-action">
+          <button id="btn-generate-preview" class="btn btn-primary btn-lg">Generate Playlist Preview</button>
+        </div>
+      </div>
+
+      <!-- Preview Results Area -->
+      <div id="playlist-preview-container" class="preview-box hidden">
+        <div class="preview-header">
+          <div>
+            <span class="tag-live">STEP 1: PREVIEW DRAFT</span>
+            <h3 id="draft-title">—</h3>
+            <p id="draft-desc" class="muted">—</p>
+          </div>
+          <div class="preview-actions">
+            <button id="btn-confirm-export" class="btn btn-spotify">
+              Step 2: Confirm &amp; Save Private Playlist to Spotify
+            </button>
+            <a id="link-exported-spotify" href="#" target="_blank" class="btn btn-secondary hidden">Open in Spotify ↗</a>
+          </div>
+        </div>
+        <div id="draft-tracks-grid" class="rec-grid"></div>
+      </div>
+    </section>
+
+    <!-- Bottom: Play History & Skip/Repeat Behavior Log -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h2>Tracked Listening History &amp; Skip/Repeat State Log</h2>
+          <p class="muted">Tracks under 30s or &lt;50% completion are flagged as Skipped and down-weighted; repeat loops boost Taste DNA.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Track &amp; Artist</th>
+              <th>Beat Archetype</th>
+              <th>Music Message &amp; Theme</th>
+              <th>BPM / Data Source</th>
+              <th>Behavior (Skip / Repeat)</th>
+              <th>Simulate Feedback</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Settings & Tunable Taste Weights Modal -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Settings, OS Keyring Credentials &amp; Taste Weights</h2>
+        <button id="btn-close-settings" class="btn btn-ghost">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-grid">
+          <div class="settings-block">
+            <h3>1. Spotify OAuth2 PKCE (No Client Secret Needed)</h3>
+            <p class="muted small">
+              In your Spotify Developer Dashboard, add Redirect URI:
+              <code>http://127.0.0.1:8765/callback</code>
+            </p>
+            <label>Spotify Client ID (Stored in Windows Credential Manager via Keyring)</label>
+            <input id="set-spotify-id" type="password" placeholder="Leave blank to keep existing" />
+            <span id="lbl-spotify-masked" class="muted small"></span>
+            <div style="margin-top:10px; display:flex; gap:8px;">
+              <button id="btn-connect-spotify" class="btn btn-spotify">Authorize Spotify Web API (PKCE)</button>
+            </div>
+            <label class="checkbox-row" style="margin-top:12px;">
+              <input id="set-winmedia" type="checkbox" checked />
+              <span>Auto-Connect to Active Windows Spotify Desktop App on Boot</span>
+            </label>
+          </div>
+
+          <div class="settings-block">
+            <h3>2. LLM Interpreter &amp; Lyrics Privacy</h3>
+            <p class="muted small">
+              Measured BPM/energy come from ReccoBeats. The LLM only interprets Beat Archetype &amp; Lyrical Message using a strict Pydantic JSON schema.
+            </p>
+            <label>LLM Provider</label>
+            <select id="set-llm-provider">
+              <option value="ollama">Ollama (Local &amp; 100% Private)</option>
+              <option value="gemini">Google Gemini API</option>
+              <option value="openai">OpenAI API</option>
+              <option value="heuristic">Deterministic Musicology Heuristic (No LLM)</option>
+            </select>
+            <label>Model Name</label>
+            <input id="set-llm-model" type="text" placeholder="e.g. llama3.2, gemini-2.5-flash, gpt-4o-mini" />
+            <label>Cloud LLM API Key (Keyring Protected)</label>
+            <input id="set-llm-key" type="password" placeholder="Leave blank to keep existing" />
+            <span id="lbl-llm-masked" class="muted small"></span>
+            <label>Optional Last.fm API Key (for track.getSimilar candidates)</label>
+            <input id="set-lastfm-key" type="password" placeholder="Leave blank to keep existing" />
+            <label class="checkbox-row" style="margin-top:10px;">
+              <input id="set-send-lyrics-cloud" type="checkbox" />
+              <span>Allow sending transient LRCLIB lyrics to Cloud LLMs (Off = local theme summary only)</span>
+            </label>
+          </div>
+
+          <div class="settings-block full-span">
+            <h3>3. Tunable Skip Detection &amp; Taste DNA Exponential Decay Weights</h3>
+            <div class="weights-grid">
+              <div>
+                <label>Decay Half-Life (Days)</label>
+                <input id="w-halflife" type="number" step="1" min="1" max="365" value="14" />
+              </div>
+              <div>
+                <label>Skip Threshold (ms)</label>
+                <input id="w-skip-ms" type="number" step="1000" value="30000" />
+              </div>
+              <div>
+                <label>Skip Min Completion Ratio</label>
+                <input id="w-skip-ratio" type="number" step="0.05" min="0.1" max="0.9" value="0.50" />
+              </div>
+              <div>
+                <label>Skip Weight Penalty</label>
+                <input id="w-skip-penalty" type="number" step="0.05" value="0.15" />
+              </div>
+              <div>
+                <label>Repeat Bonus / Loop</label>
+                <input id="w-repeat-bonus" type="number" step="0.05" value="0.45" />
+              </div>
+              <div>
+                <label>Late-Night Multiplier (22:00-04:00)</label>
+                <input id="w-night-boost" type="number" step="0.05" value="1.35" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <span id="settings-save-msg" class="muted"></span>
+        <button id="btn-save-settings" class="btn btn-primary">Save Settings &amp; Recalculate Taste DNA</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
